@@ -1,0 +1,15 @@
+.timer {
+  margin: 0 auto;
+  width: 150px;
+  height: 35px;
+  font-size: 30px;
+  text-align: center;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-evenly;
+  margin: 0 auto;
+  width: 500px;
+  padding: 20px;
+}
