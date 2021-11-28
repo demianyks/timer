@@ -12,36 +12,33 @@ export class AppComponent {
   public displayTimer: string = '00:00';
   public isRunning: boolean = false;
   public time: number = 0;
-
-  public pendingClick:any;
+  public subscriptionLive: any;
+  public pendingClick: any;
   public clicked = 0;
 
-  startTimer() {
+  toggleTimer(t:number) {
     this.isRunning = !this.isRunning;
-    timer(0, 1000).subscribe(() => {
+    const subscription = timer(0, 1000).subscribe(() => {
       if (this.isRunning) {
-        this.time++;
-        this.formatTime(this.time);
+        t++;
+        this.formatTime(t);
+        this.subscriptionLive = subscription;
+        this.time = t
+      } else {
+        t = 0;
+        this.formatTime(t);
+        subscription.unsubscribe();
       }
-    });
-  }
-
-  stopTimer() {
-    this.time = 0;
-    this.isRunning = !this.isRunning;
-    this.formatTime(0)
-  }
-
-  toggleTimer() {
-    this.isRunning ? this.stopTimer() : this.startTimer();
+    })
   }
 
   waitTimer() {
     if (this.isRunning) {
-      this.isRunning = !this.isRunning;
       this.formatTime(this.time);
+      console.log(this.displayTimer)
+      this.isRunning = !this.isRunning;
     } else {
-      this.startTimer();
+      this.toggleTimer(this.time);
     }
   }
 
@@ -56,24 +53,23 @@ export class AppComponent {
     clearTimeout(this.pendingClick)
     this.pendingClick = setTimeout(() => {
       if (!this.isRunning) {
-        this.startTimer();
+        this.toggleTimer(this.time);
       }
       this.clicked = 0;
     }, 500);
   }
 
   dblClick() {
-    this.waitTimer();
+     this.waitTimer();
   }
 
   resetTimer() {
-    if (this.isRunning) {
-      this.time = 0
+    if (this.isRunning && this.subscriptionLive) {
       this.isRunning = !this.isRunning;
-      this.startTimer()
+      this.subscriptionLive.unsubscribe();
+      this.toggleTimer(0);
     } else {
-      this.time = 0
-      this.startTimer()
+      this.toggleTimer(0)
     }
   }
 
@@ -89,5 +85,4 @@ export class AppComponent {
     }
     this.displayTimer = min + ':' + sec;
   }
-
 }
